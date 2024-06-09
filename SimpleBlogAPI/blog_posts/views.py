@@ -3,10 +3,17 @@ from rest_framework.response import Response
 from django.http import Http404
 
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import BasePermission
+from rest_framework.permissions import AllowAny
 from django_filters import rest_framework as filters
 
 from .models import Posts
 from .serializers import PostsSerializer
+
+
+class ReadOnly(BasePermission):
+    def has_permission(self, request, view):
+        return request.method in ['GET']
 
 
 class PostsFilter(filters.FilterSet):
@@ -35,7 +42,19 @@ class Pagination(PageNumberPagination):
         })
 
 
-class PostsCreateRead(generics.ListCreateAPIView):
+class PostsCreate(generics.CreateAPIView):
+
+    queryset = Posts.objects.all()
+    serializer_class = PostsSerializer
+    pagination_class = Pagination
+
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = PostsFilter
+
+
+class PostsRead(generics.ListAPIView):
+    permission_classes = [AllowAny]
+
     queryset = Posts.objects.all()
     serializer_class = PostsSerializer
     pagination_class = Pagination
