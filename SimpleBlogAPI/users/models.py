@@ -8,7 +8,5 @@ class Users(models.Model):
     name = models.CharField(max_length=30)
     password = models.CharField(max_length=300)
 
-
-
     def __str__(self):
         return f"{self.id ,self.name, self.email, self.password}"
